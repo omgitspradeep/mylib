@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The gramps.gui Module &#8212; Our Shared Library 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="The gramps.gui Module" href="second.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="second.html" title="The gramps.gui Module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Our Shared Library 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">Code Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">gramps.gui</span></code> Module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gramps.gui">
+<span id="the-gramps-gui-module"></span><h1>The <a class="reference internal" href="#module-gramps.gui" title="gramps.gui"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gramps.gui</span></code></a> Module<a class="headerlink" href="#module-gramps.gui" title="Permalink to this headline">¶</a></h1>
+<p>Package init for the gui package.</p>
+<div class="section" id="third">
+<h2>Third<a class="headerlink" href="#third" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="about-dialog">
+<h2>About Dialog<a class="headerlink" href="#about-dialog" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gramps.gui.basesidebar">
+<span id="base-sidebar"></span><h2>Base Sidebar<a class="headerlink" href="#module-gramps.gui.basesidebar" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gramps.gui.basesidebar.BaseSidebar">
+<em class="property">class </em><code class="sig-prename descclassname">gramps.gui.basesidebar.</code><code class="sig-name descname">BaseSidebar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbstate</span></em>, <em class="sig-param"><span class="n">uistate</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gramps/gui/basesidebar.html#BaseSidebar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gramps.gui.basesidebar.BaseSidebar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The base class for all sidebar plugins.</p>
+<dl class="py method">
+<dt id="gramps.gui.basesidebar.BaseSidebar.active">
+<code class="sig-name descname">active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cat_num</span></em>, <em class="sig-param"><span class="n">view_num</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gramps/gui/basesidebar.html#BaseSidebar.active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gramps.gui.basesidebar.BaseSidebar.active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the sidebar is made visible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gramps.gui.basesidebar.BaseSidebar.get_top">
+<code class="sig-name descname">get_top</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gramps/gui/basesidebar.html#BaseSidebar.get_top"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gramps.gui.basesidebar.BaseSidebar.get_top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the top container widget for the GUI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gramps.gui.basesidebar.BaseSidebar.inactive">
+<code class="sig-name descname">inactive</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gramps/gui/basesidebar.html#BaseSidebar.inactive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gramps.gui.basesidebar.BaseSidebar.inactive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the sidebar is hidden.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gramps.gui.basesidebar.BaseSidebar.view_changed">
+<code class="sig-name descname">view_changed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cat_num</span></em>, <em class="sig-param"><span class="n">view_num</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gramps/gui/basesidebar.html#BaseSidebar.view_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gramps.gui.basesidebar.BaseSidebar.view_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the active view is changed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">gramps.gui</span></code> Module</a><ul>
+<li><a class="reference internal" href="#third">Third</a></li>
+<li><a class="reference internal" href="#about-dialog">About Dialog</a></li>
+<li><a class="reference internal" href="#module-gramps.gui.basesidebar">Base Sidebar</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="second.html"
+                        title="previous chapter">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">gramps.gui</span></code> Module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/gen/third.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="second.html" title="The gramps.gui Module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Our Shared Library 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" >Code Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">gramps.gui</span></code> Module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Pradeep Khanal.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

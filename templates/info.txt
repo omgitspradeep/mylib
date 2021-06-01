@@ -1,0 +1,35 @@
+INSTALLED APPS
+
+corsheaders -> To allow api request only from specific domain
+django_cleanup.apps.CleanupConfig -> To remove old image when new image is uploaded
+
+
+
+ADMIN
+
+Admin activates the reader's account before reader can have access.
+
+
+
+ TASKS:
+ 0. Update only note on book borrow
+ 1.  accept book borrow (if api is called by book owner.----> Implement with front end design)
+ 2. Test all conditions when book borrow is accepted. like book status, reader's book hold, accetance date, remaining days etc
+
+ 3.Return book only if api is called by book owner.
+ 4. Test all conditions when borrowed book is returned. like book status, reader's book hold, delete of Borrow record, create new record in BorrowHistory,  etc
+
+
+
+TEST:
+
+1. Owner of book can't request his own book. (Done)
+2. Owner of book cannot change borrow count. (Done)
+3. User/Reader cannot activate his/her own account. (Done)
+4. Get list of only those Readers/Users whose account is activated. (Done)
+5. Creation of borrow request doesn't effect any change except create one record in "Borrow" table.   (Done)
+6. Acceptance of borrow request changes: Book [available_status], Reader [books_borrowed], Borrow[borrow_accept,borrow_accept_date]     (Done)
+7. Cancel the borrow request, before the Borrower collects book from owner. (Done)
+8. Cancel the borrow request, before Owner accepts the borrow request. (Done)
+9. Cancel the borrow request, after the Borrower collects book from owner.  (Done)
+10. Return of book changes: Book [available_status,borrow_count], Reader [books_borrowed], delete Borrow[], create BorrowHistory[]  (Done)
