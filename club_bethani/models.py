@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import Group
 from django.db.models.lookups import LessThan
 from django.core.validators import MaxValueValidator, MinValueValidator 
+from django.contrib.auth.models import User
+
+from django.http import response
 
 # Create your models here.
 class Reader(models.Model):
@@ -21,10 +24,11 @@ class Reader(models.Model):
         ('B','Business'),
         ('E','Employee'),
     )
+
+    # we won't user firstname, lastname, email of "User" because it makes difficult for updating.
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     firstname = models.CharField(max_length=15)
     lastname = models.CharField(max_length=15)
-    username = models.CharField(max_length=100,unique=True,null=True)
-    password =models.CharField(max_length=50,null=True)
     gender = models.CharField(max_length=7, choices = GENDER)
     address = models.CharField(max_length=45)
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # validators should be a list
@@ -50,6 +54,8 @@ class Reader(models.Model):
         except:
             return 0
     
+
+
 
 class Book(models.Model):
 
@@ -79,11 +85,15 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def is_owner_active(self):
+        return self.reader.account_activated
+
 
     
 class Borrow(models.Model):
     borrower = models.ForeignKey(Reader, on_delete=models.SET_NULL, related_name='book_borrower', null=True)
-    book_borrowed = models.OneToOneField(Book, on_delete=models.SET_NULL, related_name='book_borrowed', null=True)
+    book_borrowed = models.OneToOneField(Book, on_delete=models.SET_NULL, related_name='book_borroweed', null=True)
     request_date = models.DateTimeField(auto_now=False,auto_now_add=True)
     borrow_accept= models.BooleanField(default=False)
     book_received_by_borrower= models.BooleanField(default=False)
@@ -134,6 +144,9 @@ class BorrowHistory(models.Model):
     
     def book_owner(self):
         return self.book_borrowed.reader
+
+
+
 
 '''
 Note:
