@@ -104,15 +104,16 @@ EMAIL_USE_TLS = True
 REST_FRAMEWORK = {
     
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 10
 }
 
 
 
 from datetime import time, timedelta
-'''
+
+
 DEFAULTS = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -136,7 +137,8 @@ DEFAULTS = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
-'''
+
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -200,3 +202,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # The location to redirect after successful login
 LOGIN_REDIRECT_URL = 'home'
+

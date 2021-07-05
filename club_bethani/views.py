@@ -1,9 +1,9 @@
-import json
 from django.db.models import manager
+from django.http import response
 from django.shortcuts import render
 from django.urls import base, reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.http.response import Http404, JsonResponse
+from django.http.response import JsonResponse
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -13,6 +13,7 @@ from requests import api
 
 from rest_framework import status
 from rest_framework import pagination
+from rest_framework.views import APIView
 
 from club_bethani.serializer import ReaderSerializer, BookSerializer, BorrowSerializer, BorrowHistorySerializer, UserSerializer
 from club_bethani.models import Reader, Book, Borrow, BorrowHistory
@@ -22,7 +23,7 @@ from mylib.mypaginations import MyPageNumberPagination
 
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import BasePagination, PageNumberPagination
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -45,9 +46,11 @@ import requests
 # Create your views here.
 
 
+
 #This gives paginated output only when user provides token
 # Offers only GET and POST operations on Book (1. UPload new book 2. Get Paginated books)
 class BookModelViewSet(viewsets.ModelViewSet):
+    parser_classes = [MultiPartParser, FormParser]
     queryset = Book.objects.filter(reader__account_activated='True').order_by('-id')
     serializer_class = BookSerializer
     authentication_classes = [JWTAuthentication]
@@ -62,7 +65,7 @@ def login(request):
         passwrd = request.POST['password']
 
         if uname is None or passwrd is None:
-            return Response({'error': 'Please enter username & password!'},status=HTTP_400_BAD_REQUEST)
+            return Response('Please enter username & password!',status=HTTP_400_BAD_REQUEST)
 
         # You cannot use password to get user object directly. Therefore, use authenticate.
         usr = authenticate(username= uname, password=passwrd)
@@ -93,16 +96,16 @@ def login(request):
                     "token": str(refresh.access_token)
                 }
 
-                return JsonResponse({
+                return Response({
                     "jwtToken":token_data,
                     "profile":reader_seri.data,
                     "books":all_books
                 }, status=HTTP_200_OK)
             else:
-                return JsonResponse({'error': 'Please enter Valid Creadentials!'},status=HTTP_404_NOT_FOUND)
+                return Response('Please enter Valid Creadentials!',status=HTTP_404_NOT_FOUND)
 
         else:
-            return JsonResponse({'error': 'Account does not exists'},status=HTTP_404_NOT_FOUND)
+            return Response('Account does not exists',status=HTTP_404_NOT_FOUND)
 
 
 # It is called from login
@@ -156,9 +159,9 @@ def readerApi(request,id=0):
         reader= Reader.objects.filter(pk=id,account_activated=True).first()
         if reader:
             readers_serializer = ReaderSerializer(reader)
-            return JsonResponse(readers_serializer.data, safe=False)
+            return Response(readers_serializer.data, status=HTTP_200_OK)
         else:
-            return JsonResponse("Account is deactivate or does not exits", safe=False)
+            return Response("Account is deactivate or does not exits", status=HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getReader/   Body: json data without image because image is sent as string for now
@@ -184,9 +187,9 @@ def readerApi(request,id=0):
         try:
             reader = Reader.objects.get(id=id)
             #reader.delete()
-            return JsonResponse("Dear "+reader.full_name()+", Please contact admin to delete your account.", safe= False)
+            return Response("Dear "+reader.full_name()+", Please contact admin to delete your account.", status=HTTP_200_OK)
         except ObjectDoesNotExist:
-            return JsonResponse("Such user does not exits.", safe=False)
+            return Response("Such user does not exits.", status=HTTP_404_NOT_FOUND)
 
 
 #This performs only BOOK UPDATE and BOOK DELETE
@@ -199,7 +202,7 @@ def bookApi(request,ownerId=0):
     try:
         bookId = request.data.get('id')
     except:
-        JsonResponse("Provide bookId in Request", safe= False)
+        Response("Provide bookId in Request", status=HTTP_400_BAD_REQUEST)
     
     if request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1,"desc":"ddfd" }
@@ -211,18 +214,23 @@ def bookApi(request,ownerId=0):
                 book_serializer = BookSerializer(book,data=request.data, partial=True)
                 if book_serializer.is_valid():
                     book_serializer.save()
-                    return JsonResponse("Book updated Successfully.", safe=False)
+                    return Response(book_serializer.data, status=HTTP_200_OK)
             else:
-                return JsonResponse("You can make changes on your books only.", safe=False)
+                return Response("You can make changes on your books only.", status=HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse("Failed to create a Book. You cannot update borrow count of your own book.", safe= False)            
-        return JsonResponse("Failed to update a Book. Try again", safe= False)
+            return Response("Failed to create a Book. You cannot update borrow count of your own book.", status=HTTP_400_BAD_REQUEST)            
+        return Response("Failed to update a Book. Try again", status=HTTP_400_BAD_REQUEST)
    
     elif request.method == 'DELETE':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-        reader = Book.objects.get(pk=bookId)
-        #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-        return JsonResponse("Book deleted successfully.", safe= False)
+        book = Book.objects.get(pk=bookId)
+
+        if ownerId == book.reader.id:
+            reader = Book.objects.get(pk=bookId)
+            #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
+            return Response("Book Deleted successfully.",status=HTTP_200_OK)
+        else:
+            return Response("You can delete your books only.",status=HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -232,7 +240,7 @@ def bookApi(request,ownerId=0):
 def getMyBooks(request,ownerId):
     # API : http://127.0.0.1:8000/bbc/api/getMyBooks/1
     paginator = PageNumberPagination()
-    paginator.page_size = 2
+    paginator.page_size = 10
     mybooks = Book.objects.filter(reader=ownerId).order_by("-id")
     result_page = paginator.paginate_queryset(mybooks, request)
     mybooks_seri = BookSerializer(result_page, many= True)
@@ -250,7 +258,7 @@ def changePassword(request):
     new_pass = request.POST['newpass']
 
     if uname is None or upass is None:
-        return Response({'error': 'Please enter username & password!'},status=HTTP_400_BAD_REQUEST)
+        return Response('Please enter username & password!',status=HTTP_400_BAD_REQUEST)
     
     # You cannot use password to get user object directly. Therefore, use authenticate.
     usr = authenticate(username= uname, password=upass)
@@ -258,9 +266,9 @@ def changePassword(request):
         usr.set_password(new_pass)
         usr.save()
 
-        return JsonResponse({"msg":"Successful"}, safe= False)
+        return Response("Password is changed successfully", status=HTTP_200_OK)
     else:
-        return JsonResponse({"msg":"Wrong credentials"}, safe=False)
+        return Response({"msg":"Wrong credentials"}, status=HTTP_400_BAD_REQUEST)
 
 
 def getBorrows(id):
@@ -288,7 +296,7 @@ def borrowApi(request,id=0):
             borrower = Reader.objects.get(id=int(borrow_data['borrower']))
             
             if(book.reader == borrower):
-                return Response({"msg":"You cannot borrow your own Book. Thank you."}, status=HTTP_400_BAD_REQUEST)
+                return Response("You cannot borrow your own Book. Thank you.", status=HTTP_400_BAD_REQUEST)
 
             already_borrowed_books=borrower.books_borrowed
             if(already_borrowed_books<2):
@@ -302,10 +310,10 @@ def borrowApi(request,id=0):
                         "my_events":data
                     }, status=HTTP_200_OK)
             else:
-                return Response("Failed to borrow a Book. Try again (You have already borrowed 2 books)", status=HTTP_400_BAD_REQUEST)
+                return Response("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
 
 
-        return Response({"msg":"Failed to borrow a Book. Try again (Book status unavailable)"}, status=HTTP_400_BAD_REQUEST)
+        return Response("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
 
     
     elif request.method == 'PUT':
@@ -341,10 +349,10 @@ def borrowApi(request,id=0):
                             "my_events": data
                             }, status=HTTP_200_OK)
                 else:
-                    return Response({"msg":"Book can't be issued. Borrower already have 2 borrowed books)"}, status=HTTP_400_BAD_REQUEST)
+                    return Response("Book can't be issued. Borrower already have 2 borrowed books", status=HTTP_400_BAD_REQUEST)
 
             else:
-                return Response({"msg":"Book request is already accepted for you.)"}, status=HTTP_400_BAD_REQUEST)
+                return Response("Book request is already accepted for you.", status=HTTP_400_BAD_REQUEST)
 
         elif(borrow_data['borrow_accept'] and borrow_data['book_received_by_borrower'] and not borrow_data['returned']):
             # Here, Borrower collects requested book from Owner of book. But, Owner should accept the borrow request first.
@@ -438,5 +446,6 @@ def borrowHistoryApi(request):
         borrows = BorrowHistory.objects.all()
         borrows_serializer = BorrowHistorySerializer(borrows, many=True)
         return JsonResponse(borrows_serializer.data, safe=False)
+
 
 
