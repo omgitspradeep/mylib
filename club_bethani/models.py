@@ -6,10 +6,15 @@ from django.contrib.auth.models import Group
 from django.db.models.lookups import LessThan
 from django.core.validators import MaxValueValidator, MinValueValidator 
 from django.contrib.auth.models import User
-
-from django.http import response
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
+from django.conf import  settings
+from django.contrib.auth.models import User
 
 # Create your models here.
+
+User._meta.get_field('email')._unique = True
+
 class Reader(models.Model):
     
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
