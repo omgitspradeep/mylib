@@ -133,7 +133,11 @@ def signUpNewUser(request):
 
         usrname= request.data.get('username')                   
 
-        user = UserSerializer(data=request.data)
+        try:
+            user = UserSerializer(data=request.data)
+        except ValidationError:
+            return Response({"error":"Account with provided Email already exists."},status=HTTP_404_NOT_FOUND)
+
         if user.is_valid():
             user.save()
             # Getting just created User object
@@ -146,6 +150,7 @@ def signUpNewUser(request):
             return Response({"error":"Username already taken. Try another"},status=HTTP_404_NOT_FOUND)
     else:
         return Response({"error":"failed"},status=HTTP_404_NOT_FOUND)
+
 
 
 # no POST method: We cannot only create reader during signup.
