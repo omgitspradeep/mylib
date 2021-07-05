@@ -6,6 +6,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==3.4.7
 defusedxml==0.7.1
+dj-database-url==0.5.0
 Django==3.2.4
 django-cleanup==5.2.0
 django-cors-headers==3.7.0
@@ -14,6 +15,7 @@ djangorestframework==3.12.4
 djangorestframework-jwt==1.11.0
 djangorestframework-simplejwt==4.7.1
 djoser==2.1.0
+gunicorn==20.1.0
 idna==2.10
 itypes==1.2.0
 Jinja2==3.0.1
@@ -32,3 +34,4 @@ social-auth-core==4.1.0
 sqlparse==0.4.1
 uritemplate==3.0.1
 urllib3==1.26.5
+whitenoise==5.2.0

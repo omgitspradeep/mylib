@@ -25,15 +25,15 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +59,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,6 +88,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mylib.wsgi.application'
 
+#To serve files directly from their original locations (usually in STATICFILES_DIRS or app static subdirectories) without needing to be collected into STATIC_ROOT by the collectstatic command; set WHITENOISE_USE_FINDERS to True.
+#WHITENOISE_USE_FINDERS = True
 
 # Email SMTP setting
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
