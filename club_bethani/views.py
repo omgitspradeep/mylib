@@ -72,7 +72,6 @@ def login(request):
 
         if usr is not None:
             print("Inside User..............")
-            print("Inside User 2..............")
 
             # 2. Get userProfile
             person = Reader.objects.get(user = usr.id)
@@ -81,7 +80,6 @@ def login(request):
             if person.account_activated: 
                 reader_seri = ReaderSerializer(person)
                 print(reader_seri.data.items)
-                print("Inside activated..............")
 
                 # 4. Get allBooks (with pagination)
                 try:
