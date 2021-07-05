@@ -90,7 +90,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'mylib.wsgi.application'
 
 #To serve files directly from their original locations (usually in STATICFILES_DIRS or app static subdirectories) without needing to be collected into STATIC_ROOT by the collectstatic command; set WHITENOISE_USE_FINDERS to True.
-#WHITENOISE_USE_FINDERS = True
+# If we turn DEBUG as False then we need to include below line for graphics.
+WHITENOISE_USE_FINDERS = True
 
 # Email SMTP setting
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -200,8 +201,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'media/')
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
 # The location to redirect after successful login
