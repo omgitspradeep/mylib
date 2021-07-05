@@ -1,1 +1,1 @@
-web: gunicorn <mylib>.wsgi --log-file -
+web: gunicorn mylib.wsgi --log-file -
