@@ -20,9 +20,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/S
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'vefweo08v%wlxn^0pw+6_wk%1!ydf&l*1bww(w8wz6b&gp-8gd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -199,7 +200,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'media/')
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
 # The location to redirect after successful login
