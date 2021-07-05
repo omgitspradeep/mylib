@@ -57,56 +57,59 @@ class BookModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+@api_view(['POST'])
 @csrf_exempt
 def login(request):
+
     # 1. Validate 
-    if request.method == 'POST':
-        uname = request.POST['username']
-        passwrd = request.POST['password']
-
-        if uname is None or passwrd is None:
-            return Response({'error': 'Please enter username & password!'},status=HTTP_400_BAD_REQUEST)
-
-        # You cannot use password to get user object directly. Therefore, use authenticate.
-        usr = authenticate(username= uname, password=passwrd)
-
-        if usr is not None:
-            print("Inside User..............")
-
-            # 2. Get userProfile
-            person = Reader.objects.get(user = usr.id)
-
-            #3. Check if Reader's account is activated 
-            if person.account_activated: 
-                reader_seri = ReaderSerializer(person)
-                print(reader_seri.data.items)
-
-                # 4. Get allBooks (with pagination)
-                try:
-                    books = requests.get("http://"+request.get_host()+reverse('allbookspag'))
-                    all_books = "not avl"
-                    if books.status_code == 200:
-                        all_books = books.json() 
-                except:
-                    all_books ="Fail"
-
-                # 5. Get JWT Tokens
-                refresh  = RefreshToken.for_user(usr)
-                token_data = {
-                    "refresh" : str(refresh),
-                    "token": str(refresh.access_token)
-                }
-
-                return JsonResponse({
-                    "jwtToken":token_data,
-                    "profile":reader_seri.data,
-                    "books":all_books
-                }, status=HTTP_200_OK)
-            else:
-                return JsonResponse({"error": "Please enter Valid Creadentials!"},status=HTTP_404_NOT_FOUND)
-
+    uname = request.POST['username']
+    passwrd = request.POST['password']
+    if uname is None or passwrd is None:
+        return Response({'error': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
+    try:    
+        if '@' in uname:
+            kwargs = {'email': uname}
+            usr = get_user_model().objects.get(**kwargs)
+            if not usr.check_password(passwrd):
+                return Response({'error': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse({"error":"Please enter Valid Username and password"},status=HTTP_400_BAD_REQUEST)
+            # You cannot use password to get user object directly. Therefore, use authenticate.
+            usr = authenticate(username= uname, password=passwrd)
+            if usr is None:
+                return Response({'error': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
+
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exists!'},status=HTTP_400_BAD_REQUEST)
+    
+
+    # 2. Get userProfile
+    person = Reader.objects.get(user = usr.id)
+    #3. Check if Reader's account is activated 
+    if person.account_activated: 
+        reader_seri = ReaderSerializer(person)
+        print(reader_seri.data.items)
+    
+        # 4. Get allBooks (with pagination)
+        try:
+            books = requests.get("http://"+request.get_host()+reverse('allbookspag'))
+            all_books = "not avl"
+            if books.status_code == 200:
+                all_books = books.json() 
+        except:
+            all_books ="Fail"
+        # 5. Get JWT Tokens
+        refresh  = RefreshToken.for_user(usr)
+        token_data = {
+            "refresh" : str(refresh),
+            "token": str(refresh.access_token)
+        }
+        return JsonResponse({
+            "jwtToken":token_data,
+            "profile":reader_seri.data,
+            "books":all_books
+        }, status=HTTP_200_OK)
+    else:
+        return JsonResponse({"error": "Please enter Valid Creadentials!"},status=HTTP_404_NOT_FOUND)
 
 
 # It is called from login
@@ -240,7 +243,7 @@ def bookApi(request,ownerId=0):
 @api_view(["GET",])
 @permission_classes((IsAuthenticated, ))
 @authentication_classes((JWTAuthentication,))
-def getMyBooks(request,ownerId):
+def getMyBooks(request,ownerId):GET
     # API : http://127.0.0.1:8000/bbc/api/getMyBooks/1
     paginator = PageNumberPagination()
     paginator.page_size = 10
