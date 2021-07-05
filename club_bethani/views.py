@@ -1,10 +1,12 @@
 from django.db.models import manager
+from django.db import IntegrityError
+
 from django.http import response
 from django.shortcuts import render
 from django.urls import base, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import User
 from django.db.models import Q
 
@@ -37,7 +39,8 @@ from rest_framework.status import (
 )
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+
 from django.core.mail import send_mail
 from django.conf import settings
 import requests
@@ -55,7 +58,6 @@ class BookModelViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
 
 @api_view(['POST'])
 @csrf_exempt
@@ -147,18 +149,17 @@ def signUpNewUser(request):
             #rs = ReaderSerializer(student)
             return Response({"success":"User successfully created."},status=HTTP_200_OK)
         else:
-            return Response({"error":"Username already taken. Try another"},status=HTTP_404_NOT_FOUND)
+            return Response({"error":"Username or Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
     else:
         return Response({"error":"failed"},status=HTTP_404_NOT_FOUND)
-
 
 
 # no POST method: We cannot only create reader during signup.
 
 @csrf_exempt
 @api_view(["GET","PUT","DELETE"])
-@permission_classes((IsAuthenticated, ))
-@authentication_classes((JWTAuthentication,))
+#@permission_classes((IsAuthenticated, ))
+#@authentication_classes((JWTAuthentication,))
 def readerApi(request,id=0):
     if request.method == 'GET':
         # API: http://127.0.0.1:8000/bbc/api/getReader/4
@@ -171,22 +172,28 @@ def readerApi(request,id=0):
 
     elif request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getReader/   Body: json data without image because image is sent as string for now
-        id= request.data.get('id')
-        reader = Reader.objects.get(pk=id)
-        readers_serializer = ReaderSerializer(reader,data=request.data, partial=True)
-        if readers_serializer.is_valid():
-            readers_serializer.save()
+        readerId= request.data.get('id')
+        try:
+            reader = Reader.objects.get(pk=readerId)
+            readers_serializer = ReaderSerializer(reader,data=request.data, partial=True)
+            if readers_serializer.is_valid():
+                readers_serializer.save()
 
-            # If reader and user has different email addresses change user's email with reader's
-            usr = reader.user
-            reader = Reader.objects.get(user=usr)
-            if(usr.email != reader.email):
-                usr.email=reader.email
-                usr.save()
+                # If reader and user has different email addresses change user's email with reader's
+                usr = reader.user
+                reader = Reader.objects.get(user=usr)
+                if(usr.email != reader.email):
+                    usr.email=reader.email
+                    usr.save()
 
-            return JsonResponse("Reader updated Successfully.", safe=False)
-        return JsonResponse("Failed to update a reader. Try again", safe= False)
-   
+                return JsonResponse("Reader updated Successfully.", safe=False)
+            return JsonResponse("Failed to update a reader. Try again", safe= False)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({"error": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+            return JsonResponse({"error": "Provided Email already exists. Please try another"}, status=HTTP_400_BAD_REQUEST)
+            
+        
     elif request.method == 'DELETE':
         # API: http://127.0.0.1:8000/bbc/api/getReader/4
         
@@ -233,7 +240,7 @@ def bookApi(request,ownerId=0):
 
         if ownerId == book.reader.id:
             reader = Book.objects.get(pk=bookId)
-            reader.delete() #http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
+            #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
             return Response("Book Deleted successfully.",status=HTTP_200_OK)
         else:
             return Response("You can delete your books only.",status=HTTP_400_BAD_REQUEST)
@@ -243,7 +250,7 @@ def bookApi(request,ownerId=0):
 @api_view(["GET",])
 @permission_classes((IsAuthenticated, ))
 @authentication_classes((JWTAuthentication,))
-def getMyBooks(request,ownerId):GET
+def getMyBooks(request,ownerId):
     # API : http://127.0.0.1:8000/bbc/api/getMyBooks/1
     paginator = PageNumberPagination()
     paginator.page_size = 10
@@ -340,6 +347,7 @@ def borrowApi(request,id=0):
                     #Creating borrow accept time
                     borrow_accept_time_now = datetime.now()
                     borrow_data['borrow_accept_date'] = borrow_accept_time_now
+                    print(borrow_data)
 
                     borrow_serializer = BorrowSerializer(borrow,data=borrow_data)
                     if borrow_serializer.is_valid():
@@ -451,3 +459,4 @@ def borrowHistoryApi(request):
         borrows = BorrowHistory.objects.all()
         borrows_serializer = BorrowHistorySerializer(borrows, many=True)
         return JsonResponse(borrows_serializer.data, safe=False)
+
