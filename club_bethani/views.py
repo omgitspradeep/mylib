@@ -65,7 +65,7 @@ def login(request):
         passwrd = request.POST['password']
 
         if uname is None or passwrd is None:
-            return Response('Please enter username & password!',status=HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Please enter username & password!'},status=HTTP_400_BAD_REQUEST)
 
         # You cannot use password to get user object directly. Therefore, use authenticate.
         usr = authenticate(username= uname, password=passwrd)
@@ -96,16 +96,16 @@ def login(request):
                     "token": str(refresh.access_token)
                 }
 
-                return Response({
+                return JsonResponse({
                     "jwtToken":token_data,
                     "profile":reader_seri.data,
                     "books":all_books
                 }, status=HTTP_200_OK)
             else:
-                return Response('Please enter Valid Creadentials!',status=HTTP_404_NOT_FOUND)
+                return JsonResponse({"error": "Please enter Valid Creadentials!"},status=HTTP_404_NOT_FOUND)
 
         else:
-            return Response('Account does not exists',status=HTTP_404_NOT_FOUND)
+            return JsonResponse({"error":"Please enter Valid Username and password"},status=HTTP_400_BAD_REQUEST)
 
 
 # It is called from login
