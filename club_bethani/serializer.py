@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         email = validated_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError({"error":"Account with provided Email alreadry exists."})
+            raise serializers.ValidationError({"error":"Account with provided Email already exists."})
         user = super(UserSerializer, self).create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
