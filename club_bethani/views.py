@@ -133,10 +133,7 @@ def signUpNewUser(request):
 
         usrname= request.data.get('username')                   
 
-        try:
-            user = UserSerializer(data=request.data)
-        except ValidationError:
-            return Response({"error":"Account with provided Email already exists."},status=HTTP_404_NOT_FOUND)
+        user = UserSerializer(data=request.data)
 
         if user.is_valid():
             user.save()
