@@ -446,6 +446,3 @@ def borrowHistoryApi(request):
         borrows = BorrowHistory.objects.all()
         borrows_serializer = BorrowHistorySerializer(borrows, many=True)
         return JsonResponse(borrows_serializer.data, safe=False)
-
-
-
