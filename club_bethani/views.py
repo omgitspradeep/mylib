@@ -228,7 +228,7 @@ def bookApi(request,ownerId=0):
 
         if ownerId == book.reader.id:
             reader = Book.objects.get(pk=bookId)
-            #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
+            reader.delete() #http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
             return Response("Book Deleted successfully.",status=HTTP_200_OK)
         else:
             return Response("You can delete your books only.",status=HTTP_400_BAD_REQUEST)
@@ -335,7 +335,6 @@ def borrowApi(request,id=0):
                     #Creating borrow accept time
                     borrow_accept_time_now = datetime.now()
                     borrow_data['borrow_accept_date'] = borrow_accept_time_now
-                    print(borrow_data)
 
                     borrow_serializer = BorrowSerializer(borrow,data=borrow_data)
                     if borrow_serializer.is_valid():
