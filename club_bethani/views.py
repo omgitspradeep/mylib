@@ -301,12 +301,6 @@ def borrowApi(request,id=0):
         return Response({"my_events":data}, status=HTTP_200_OK)
 
     elif request.method == 'POST':
-        # Borrow book     if request.method == 'GET':
-        # Get all Borrow Events
-        data = getBorrows(id)
-        return Response({"my_events":data}, status=HTTP_200_OK)
-
-    elif request.method == 'POST':
         # Borrow book 
         borrow_data=JSONParser().parse(request)
         try:
