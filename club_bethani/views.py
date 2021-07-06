@@ -67,21 +67,21 @@ def login(request):
     uname = request.POST['username']
     passwrd = request.POST['password']
     if uname is None or passwrd is None:
-        return Response({'error': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
     try:    
         if '@' in uname:
             kwargs = {'email': uname}
             usr = get_user_model().objects.get(**kwargs)
             if not usr.check_password(passwrd):
-                return Response({'error': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
         else:
             # You cannot use password to get user object directly. Therefore, use authenticate.
             usr = authenticate(username= uname, password=passwrd)
             if usr is None:
-                return Response({'error': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
 
     except User.DoesNotExist:
-        return Response({'error': 'User does not exists!'},status=HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'User does not exists!'},status=HTTP_400_BAD_REQUEST)
     
 
     # 2. Get userProfile
@@ -111,7 +111,7 @@ def login(request):
             "books":all_books
         }, status=HTTP_200_OK)
     else:
-        return JsonResponse({"error": "Account not activated.!"},status=HTTP_404_NOT_FOUND)
+        return JsonResponse({"detail": "Account not activated.!"},status=HTTP_404_NOT_FOUND)
 
 
 # It is called from login
@@ -147,11 +147,11 @@ def signUpNewUser(request):
             # Making recently created User as new Reader 
             Reader.objects.create(user=myuser,firstname=first_name,lastname=last_name,gender=gender,address=address,phone_number=phone_number,email=email,house_no=house_no,profession=profession)
             #rs = ReaderSerializer(student)
-            return JsonResponse({"success":"User successfully created."},status=HTTP_200_OK)
+            return JsonResponse({"detail":"User successfully created."},status=HTTP_200_OK)
         else:
-            return JsonResponse({"error":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
+            return JsonResponse({"detail":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
     else:
-        return JsonResponse({"error":"failed"},status=HTTP_404_NOT_FOUND)
+        return JsonResponse({"detail":"failed"},status=HTTP_404_NOT_FOUND)
 
 
 # no POST method: We cannot only create reader during signup.
@@ -168,7 +168,7 @@ def readerApi(request,id=0):
             readers_serializer = ReaderSerializer(reader)
             return Response(readers_serializer.data, status=HTTP_200_OK)
         else:
-            return Response("Account is deactivate or does not exits", status=HTTP_400_BAD_REQUEST)
+            return Response({"detail":"Account is deactivate or does not exits"}, status=HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getReader/   Body: json data without image because image is sent as string for now
@@ -186,12 +186,12 @@ def readerApi(request,id=0):
                     usr.email=reader.email
                     usr.save()
 
-                return JsonResponse("Reader updated Successfully.", safe=False)
-            return JsonResponse("Failed to update a reader. Try again", safe= False)
+                return JsonResponse({"detail" : "Reader updated Successfully."}, safe=False)
+            return JsonResponse({"detail" : "Failed to update a reader. Try again"}, safe= False)
         except ObjectDoesNotExist as e:
-            return JsonResponse({"error": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
         except IntegrityError as e:
-            return JsonResponse({"error": "Provided Email already exists. Please try another"}, status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_400_BAD_REQUEST)
             
         
     elif request.method == 'DELETE':
@@ -202,7 +202,7 @@ def readerApi(request,id=0):
             #reader.delete()
             return Response("Dear "+reader.full_name()+", Please contact admin to delete your account.", status=HTTP_200_OK)
         except ObjectDoesNotExist:
-            return Response("Such user does not exits.", status=HTTP_404_NOT_FOUND)
+            return Response({"detail" : "Such user does not exits."}, status=HTTP_404_NOT_FOUND)
 
 
 #This performs only BOOK UPDATE and BOOK DELETE
@@ -215,7 +215,7 @@ def bookApi(request,ownerId=0):
     try:
         bookId = request.data.get('id')
     except:
-        Response("Provide bookId in Request", status=HTTP_400_BAD_REQUEST)
+        Response({"detail" : "Provide bookId in Request"}, status=HTTP_400_BAD_REQUEST)
     
     if request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1,"desc":"ddfd" }
@@ -229,10 +229,10 @@ def bookApi(request,ownerId=0):
                     book_serializer.save()
                     return Response(book_serializer.data, status=HTTP_200_OK)
             else:
-                return Response("You can make changes on your books only.", status=HTTP_400_BAD_REQUEST)
+                return Response({"detail" : "You can make changes on your books only."}, status=HTTP_400_BAD_REQUEST)
         else:
-            return Response("Failed to create a Book. You cannot update borrow count of your own book.", status=HTTP_400_BAD_REQUEST)            
-        return Response("Failed to update a Book. Try again", status=HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "Failed to create a Book. You cannot update borrow count of your own book."}, status=HTTP_400_BAD_REQUEST)            
+        return Response({"detail" : "Failed to update a Book. Try again"}, status=HTTP_400_BAD_REQUEST)
    
     elif request.method == 'DELETE':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
@@ -241,9 +241,9 @@ def bookApi(request,ownerId=0):
         if ownerId == book.reader.id:
             reader = Book.objects.get(pk=bookId)
             #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-            return Response("Book Deleted successfully.",status=HTTP_200_OK)
+            return Response({"detail" : "Book Deleted successfully."},status=HTTP_200_OK)
         else:
-            return Response("You can delete your books only.",status=HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "You can delete your books only."},status=HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -271,7 +271,7 @@ def changePassword(request):
     new_pass = request.POST['newpass']
 
     if uname is None or upass is None:
-        return Response('Please enter username & password!',status=HTTP_400_BAD_REQUEST)
+        return Response({'detail':'Please enter username & password!'},status=HTTP_400_BAD_REQUEST)
     
     # You cannot use password to get user object directly. Therefore, use authenticate.
     usr = authenticate(username= uname, password=upass)
@@ -279,9 +279,9 @@ def changePassword(request):
         usr.set_password(new_pass)
         usr.save()
 
-        return Response("Password is changed successfully", status=HTTP_200_OK)
+        return Response({"detail":"Password is changed successfully"}, status=HTTP_200_OK)
     else:
-        return Response({"msg":"Wrong credentials"}, status=HTTP_400_BAD_REQUEST)
+        return Response({"detail":"Wrong credentials"}, status=HTTP_400_BAD_REQUEST)
 
 
 def getBorrows(id):
@@ -316,13 +316,13 @@ def borrowApi(request,id=0):
 
             if borrowReq.count()>0:
                 print("Request Already Sent.")
-                return Response("You have already sent borrow Request for this book.", status=HTTP_400_BAD_REQUEST)
+                return Response({"detail" : "You have already sent borrow Request for this book."}, status=HTTP_400_BAD_REQUEST)
             
 
             if(book.available_status):
                 borrower = Reader.objects.get(id=borrowerId)
                 if(book.reader == borrower):
-                    return Response("You cannot borrow your own Book. Thank you.", status=HTTP_400_BAD_REQUEST)
+                    return Response({"detail" : "You cannot borrow your own Book. Thank you."}, status=HTTP_400_BAD_REQUEST)
 
                 
                 already_borrowed_books=borrower.books_borrowed
@@ -333,15 +333,15 @@ def borrowApi(request,id=0):
                         # Get all Borrow Events
                         data = getBorrows(borrowerId)
                         return Response({
-                            "msg":"Book Request Successfull. Wait for confirmation....",
+                            "detail":"Book Request Successfull. Wait for confirmation....",
                             "my_events":data
                         }, status=HTTP_200_OK)
                 else:
-                    return JsonResponse("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
+                    return JsonResponse({"detail" : "Failed to borrow a Book. Try again (You have already borrowed 2 books"}, status=HTTP_400_BAD_REQUEST)
             else:
-                return JsonResponse("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({"detail":"Failed to borrow a Book. Try again (Book status unavailable)"}, status=HTTP_400_BAD_REQUEST)
         except :
-            return JsonResponse("Failed to borrow a Book. Missing request data.", status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({"detail":"Failed to borrow a Book. Missing request data."}, status=HTTP_400_BAD_REQUEST)
 
     
     elif request.method == 'PUT':
@@ -373,14 +373,14 @@ def borrowApi(request,id=0):
                         book_borrowed.update(available_status=False)
                         data = getBorrows(borrowerID)
                         return Response({
-                            "msg":"Borrow request Accepted.",
+                            "detail":"Borrow request Accepted.",
                             "my_events": data
                             }, status=HTTP_200_OK)
                 else:
-                    return Response("Book can't be issued. Borrower already have 2 borrowed books", status=HTTP_400_BAD_REQUEST)
+                    return Response({"detail" : "Book can't be issued. Borrower already have 2 borrowed books"}, status=HTTP_400_BAD_REQUEST)
 
             else:
-                return Response("Book request is already accepted for you.", status=HTTP_400_BAD_REQUEST)
+                return Response({"detail" : "Book request is already accepted for you."}, status=HTTP_400_BAD_REQUEST)
 
         elif(borrow_data['borrow_accept'] and borrow_data['book_received_by_borrower'] and not borrow_data['returned']):
             # Here, Borrower collects requested book from Owner of book. But, Owner should accept the borrow request first.
@@ -391,7 +391,7 @@ def borrowApi(request,id=0):
                 data = getBorrows(borrowerID)
 
                 return Response({
-                    "msg":"Book is received by the Borrower.",
+                    "detail":"Book is received by the Borrower.",
                     "my_events": data
                     }, status=HTTP_200_OK)
 
@@ -411,7 +411,7 @@ def borrowApi(request,id=0):
             data = getBorrows(borrowerID)
 
             return Response({
-                "msg":"Borrowed book returned Successfully.",
+                "detail":"Borrowed book returned Successfully.",
                 "my_events":data
                 }, status=HTTP_200_OK)
 
@@ -423,7 +423,7 @@ def borrowApi(request,id=0):
                 data = getBorrows(borrowerID)
 
                 return Response({
-                    "msg":"Borrow Note is updated Successfully.",
+                    "detail":"Borrow Note is updated Successfully.",
                     "my_events":data
                     }, status=HTTP_200_OK)
 
@@ -448,7 +448,7 @@ def borrowApi(request,id=0):
 
             data = getBorrows(borrowerID)
             return  Response({
-                "msg":"Borrow request cancelled Successfully. (accept: yes, collected: no)",
+                "detail":"Borrow request cancelled Successfully. (accept: yes, collected: no)",
                 "my_events":data
                 }, status= HTTP_200_OK)
         elif not borrow_request.borrow_accept:
@@ -456,13 +456,13 @@ def borrowApi(request,id=0):
             borrow_request.delete()
             data = getBorrows(borrowerID)
             return  Response({
-                "msg":"Borrow request cancelled Successfully. (accept: no)",
+                "detail":"Borrow request cancelled Successfully. (accept: no)",
                 "my_events":data
                 }, status= HTTP_200_OK)
         else:
             # accepted: True , collected: True
             return  Response({
-                "msg":"Cannot cancel request until you return the book.",
+                "detail":"Cannot cancel request until you return the book.",
                   }, status= HTTP_400_BAD_REQUEST)
 
 
