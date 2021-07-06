@@ -301,32 +301,42 @@ def borrowApi(request,id=0):
         return Response({"my_events":data}, status=HTTP_200_OK)
 
     elif request.method == 'POST':
+        # Borrow book     if request.method == 'GET':
+        # Get all Borrow Events
+        data = getBorrows(id)
+        return Response({"my_events":data}, status=HTTP_200_OK)
+
+    elif request.method == 'POST':
         # Borrow book 
         borrow_data=JSONParser().parse(request)
-        borrowerId = int(borrow_data['borrower'])
-        book = Book.objects.get(id=int(borrow_data['book_borrowed']))
-        if(book.available_status):
-            borrower = Reader.objects.get(id=int(borrow_data['borrower']))
-            
-            if(book.reader == borrower):
-                return Response("You cannot borrow your own Book. Thank you.", status=HTTP_400_BAD_REQUEST)
+        try:
+            borrowerId = int(borrow_data['borrower'])
+            book = Book.objects.get(id=int(borrow_data['book_borrowed']))
+            if(book.available_status):
+                borrower = Reader.objects.get(id=int(borrow_data['borrower']))
 
-            already_borrowed_books=borrower.books_borrowed
-            if(already_borrowed_books<2):
-                borrow_serializer = BorrowSerializer(data=borrow_data)
-                if borrow_serializer.is_valid():
-                    borrow_serializer.save()
-                    # Get all Borrow Events
-                    data = getBorrows(borrowerId)
-                    return Response({
-                        "msg":"Book Request Successfull. Wait for confirmation....",
-                        "my_events":data
-                    }, status=HTTP_200_OK)
-            else:
-                return Response("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
+                if(book.reader == borrower):
+                    return Response("You cannot borrow your own Book. Thank you.", status=HTTP_400_BAD_REQUEST)
+
+                already_borrowed_books=borrower.books_borrowed
+                if(already_borrowed_books<2):
+                    borrow_serializer = BorrowSerializer(data=borrow_data)
+                    if borrow_serializer.is_valid():
+                        borrow_serializer.save()
+                        # Get all Borrow Events
+                        data = getBorrows(borrowerId)
+                        return Response({
+                            "msg":"Book Request Successfull. Wait for confirmation....",
+                            "my_events":data
+                        }, status=HTTP_200_OK)
+                else:
+                    return Response("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
+        except:
+            return Response("Failed to borrow a Book. Required data missing.", status=HTTP_400_BAD_REQUEST)
 
 
         return Response("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
+
 
     
     elif request.method == 'PUT':
