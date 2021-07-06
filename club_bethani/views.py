@@ -302,16 +302,29 @@ def borrowApi(request,id=0):
 
     elif request.method == 'POST':
         # Borrow book 
+        # 1. Cannot borrow own book.
+        # 2. Cannot send borrow request twice for same book.
+        # 3. Cannot borrow if already borrowed 2 books
         borrow_data=JSONParser().parse(request)
         try:
             borrowerId = int(borrow_data['borrower'])
-            book = Book.objects.get(id=int(borrow_data['book_borrowed']))
-            if(book.available_status):
-                borrower = Reader.objects.get(id=int(borrow_data['borrower']))
+            bookId = int(borrow_data['book_borrowed'])
+            book = Book.objects.get(id=bookId)
 
+            # Check if user has alreadry requested for this book. 
+            borrowReq = Borrow.objects.filter(Q(borrower=borrowerId) & Q(book_borrowed=bookId)) # Borrower is one with id and owner is book_borrowed__reader
+
+            if borrowReq.count()>0:
+                print("Request Already Sent.")
+                return Response("You have already sent borrow Request for this book.", status=HTTP_400_BAD_REQUEST)
+            
+
+            if(book.available_status):
+                borrower = Reader.objects.get(id=borrowerId)
                 if(book.reader == borrower):
                     return Response("You cannot borrow your own Book. Thank you.", status=HTTP_400_BAD_REQUEST)
 
+                
                 already_borrowed_books=borrower.books_borrowed
                 if(already_borrowed_books<2):
                     borrow_serializer = BorrowSerializer(data=borrow_data)
@@ -324,12 +337,12 @@ def borrowApi(request,id=0):
                             "my_events":data
                         }, status=HTTP_200_OK)
                 else:
-                    return Response("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
-        except:
-            return Response("Failed to borrow a Book. Required data missing.", status=HTTP_400_BAD_REQUEST)
+                    return JsonResponse("Failed to borrow a Book. Try again (You have already borrowed 2 books", status=HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
+        except :
+            return JsonResponse("Failed to borrow a Book. Missing request data.", status=HTTP_400_BAD_REQUEST)
 
-
-        return Response("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
 
 
     
