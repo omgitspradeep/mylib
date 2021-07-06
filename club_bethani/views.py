@@ -125,33 +125,30 @@ class AllbooksPagination(ListAPIView):
 @api_view(['POST'])
 @csrf_exempt
 def signUpNewUser(request):
-    if request.method == 'POST':
-        # Validate all fields before creating new user.
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        gender = request.data.get('gender')
-        address = request.data.get('address')
-        phone_number = request.data.get('phone_number')
-        email = request.data.get('email')
-        house_no = request.data.get('house_no')
-        profession = request.data.get('profession')
+    # Validate all fields before creating new user.
+    first_name = request.data.get('first_name')
+    last_name = request.data.get('last_name')
+    gender = request.data.get('gender')
+    address = request.data.get('address')
+    phone_number = request.data.get('phone_number')
+    email = request.data.get('email')
+    house_no = request.data.get('house_no')
+    profession = request.data.get('profession')
 
-        usrname= request.data.get('username')                   
+    usrname= request.data.get('username')                   
 
-        user = UserSerializer(data=request.data)
+    user = UserSerializer(data=request.data)
 
-        if user.is_valid():
-            user.save()
-            # Getting just created User object
-            myuser= User.objects.get(username=usrname)
-            # Making recently created User as new Reader 
-            Reader.objects.create(user=myuser,firstname=first_name,lastname=last_name,gender=gender,address=address,phone_number=phone_number,email=email,house_no=house_no,profession=profession)
-            #rs = ReaderSerializer(student)
-            return JsonResponse({"detail":"User successfully created."},status=HTTP_200_OK)
-        else:
-            return JsonResponse({"detail":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
+    if user.is_valid():
+        user.save()
+        # Getting just created User object
+        myuser= User.objects.get(username=usrname)
+        # Making recently created User as new Reader 
+        Reader.objects.create(user=myuser,firstname=first_name,lastname=last_name,gender=gender,address=address,phone_number=phone_number,email=email,house_no=house_no,profession=profession)
+        #rs = ReaderSerializer(student)
+        return JsonResponse({"detail":"User successfully created."},status=HTTP_200_OK)
     else:
-        return JsonResponse({"detail":"failed"},status=HTTP_404_NOT_FOUND)
+        return JsonResponse({"detail":"Username / Email already taken. Try another"},safe=False)
 
 
 # no POST method: We cannot only create reader during signup.
