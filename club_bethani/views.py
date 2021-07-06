@@ -111,7 +111,7 @@ def login(request):
             "books":all_books
         }, status=HTTP_200_OK)
     else:
-        return JsonResponse({"error": "Please enter Valid Creadentials!"},status=HTTP_404_NOT_FOUND)
+        return JsonResponse({"error": "Account not activated.!"},status=HTTP_404_NOT_FOUND)
 
 
 # It is called from login
@@ -149,7 +149,7 @@ def signUpNewUser(request):
             #rs = ReaderSerializer(student)
             return Response({"success":"User successfully created."},status=HTTP_200_OK)
         else:
-            return Response({"error":"Username or Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
+            return Response({"error":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
     else:
         return Response({"error":"failed"},status=HTTP_404_NOT_FOUND)
 
@@ -291,8 +291,8 @@ def getBorrows(id):
 
 
 @api_view(["GET","POST","PUT","DELETE"])
-@permission_classes((IsAuthenticated, ))
-@authentication_classes((JWTAuthentication,))
+#@permission_classes((IsAuthenticated, ))
+#@authentication_classes((JWTAuthentication,))
 @csrf_exempt
 def borrowApi(request,id=0):
     if request.method == 'GET':
@@ -342,8 +342,6 @@ def borrowApi(request,id=0):
                 return JsonResponse("Failed to borrow a Book. Try again (Book status unavailable)", status=HTTP_400_BAD_REQUEST)
         except :
             return JsonResponse("Failed to borrow a Book. Missing request data.", status=HTTP_400_BAD_REQUEST)
-
-
 
     
     elif request.method == 'PUT':
@@ -476,4 +474,6 @@ def borrowHistoryApi(request):
         borrows = BorrowHistory.objects.all()
         borrows_serializer = BorrowHistorySerializer(borrows, many=True)
         return JsonResponse(borrows_serializer.data, safe=False)
+
+
 
