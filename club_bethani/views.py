@@ -146,7 +146,7 @@ def signUpNewUser(request):
         # Making recently created User as new Reader 
         Reader.objects.create(user=myuser,firstname=first_name,lastname=last_name,gender=gender,address=address,phone_number=phone_number,email=email,house_no=house_no,profession=profession)
         #rs = ReaderSerializer(student)
-        return JsonResponse({"detail":"User successfully created."},status=HTTP_200_OK)
+        return JsonResponse({"detail":"User successfully created. Wait for Admin approval."},status=HTTP_200_OK)
     else:
         return JsonResponse({"detail":"Username / Email already taken. Try another"},safe=False)
 
