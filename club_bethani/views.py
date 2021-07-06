@@ -147,11 +147,11 @@ def signUpNewUser(request):
             # Making recently created User as new Reader 
             Reader.objects.create(user=myuser,firstname=first_name,lastname=last_name,gender=gender,address=address,phone_number=phone_number,email=email,house_no=house_no,profession=profession)
             #rs = ReaderSerializer(student)
-            return Response({"success":"User successfully created."},status=HTTP_200_OK)
+            return JsonResponse({"success":"User successfully created."},status=HTTP_200_OK)
         else:
-            return Response({"error":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
+            return JsonResponse({"error":"Username / Email already taken. Try another"},status=HTTP_404_NOT_FOUND)
     else:
-        return Response({"error":"failed"},status=HTTP_404_NOT_FOUND)
+        return JsonResponse({"error":"failed"},status=HTTP_404_NOT_FOUND)
 
 
 # no POST method: We cannot only create reader during signup.
