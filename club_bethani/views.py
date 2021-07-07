@@ -68,6 +68,7 @@ def login(request):
     passwrd = request.POST['password']
     if uname is None or passwrd is None:
         return JsonResponse({'detail': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
+    print(uname+" "+passwrd)
     try:    
         if '@' in uname:
             kwargs = {'email': uname}
