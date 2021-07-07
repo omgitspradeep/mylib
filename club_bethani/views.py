@@ -67,21 +67,21 @@ def login(request):
     uname = request.POST['username']
     passwrd = request.POST['password']
     if uname is None or passwrd is None:
-        return Response({'detail': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'detail': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
     try:    
         if '@' in uname:
             kwargs = {'email': uname}
             usr = get_user_model().objects.get(**kwargs)
             if not usr.check_password(passwrd):
-                return Response({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
         else:
             # You cannot use password to get user object directly. Therefore, use authenticate.
             usr = authenticate(username= uname, password=passwrd)
             if usr is None:
-                return Response({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'detail': 'Wrong Credentials!'},status=HTTP_400_BAD_REQUEST)
 
     except User.DoesNotExist:
-        return Response({'detail': 'User does not exists!'},status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'detail': 'User does not exists!'},status=HTTP_400_BAD_REQUEST)
     
 
     # 2. Get userProfile
