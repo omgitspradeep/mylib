@@ -112,10 +112,12 @@ def login(request):
         #6. Get MyBooks 
         try:
             mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(person.id,)))
-            print(mybooks)
             my_all_books="not_avl"
             if mybooks.status_code == 200:
                 my_all_books = mybooks.json()
+            else:
+                my_all_books = []
+
         except:
             return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
 
