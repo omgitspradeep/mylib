@@ -10,7 +10,7 @@ from drf_extra_fields.fields import Base64ImageField
 class ReaderSerializer(serializers.ModelSerializer):
     # read_only eans that the field will be included in the APIs output but won't be included during Create or Update operations on the endpoint
     # . To populate this field, we'll create a method to automatically fill the field with the request user.
-    profile_pic = Base64ImageField(required=False)        
+    profile_pic = Base64ImageField(required=True)        
    
     class Meta:
         model = Reader
@@ -20,7 +20,7 @@ class ReaderSerializer(serializers.ModelSerializer):
 
 # Owner of books should not be able to update borrow_count for his book.
 class BookSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required=False)     
+    image = Base64ImageField(required=True)     
     class Meta:
         model = Book
         fields ='__all__'
