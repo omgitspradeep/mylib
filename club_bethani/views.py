@@ -272,7 +272,7 @@ def bookApi(request,ownerId=0):
 def getMyBooks(request,ownerId):
     # API : http://127.0.0.1:8000/bbc/api/getMyBooks/1
     paginator = PageNumberPagination()
-    paginator.page_size = 10
+    paginator.page_size = 4
     mybooks = Book.objects.filter(reader=ownerId).order_by("-id")
     result_page = paginator.paginate_queryset(mybooks, request)
     mybooks_seri = BookSerializer(result_page, many= True)
