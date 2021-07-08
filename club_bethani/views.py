@@ -207,8 +207,8 @@ def readerApi(request,id=0):
 # 
 @csrf_exempt
 @api_view(["PUT","DELETE"])
-@permission_classes((IsAuthenticated, ))
-@authentication_classes((JWTAuthentication,))
+#@permission_classes((IsAuthenticated, ))
+#@authentication_classes((JWTAuthentication,))
 def bookApi(request,ownerId=0):
     try:
         bookId = request.data.get('id')
@@ -246,8 +246,8 @@ def bookApi(request,ownerId=0):
 
 @csrf_exempt
 @api_view(["GET",])
-@permission_classes((IsAuthenticated, ))
-@authentication_classes((JWTAuthentication,))
+#@permission_classes((IsAuthenticated, ))
+#@authentication_classes((JWTAuthentication,))
 def getMyBooks(request,ownerId):
     # API : http://127.0.0.1:8000/bbc/api/getMyBooks/1
     paginator = PageNumberPagination()
@@ -261,8 +261,8 @@ def getMyBooks(request,ownerId):
 
 @csrf_exempt
 @api_view(["POST",])
-@permission_classes((IsAuthenticated, ))
-@authentication_classes((JWTAuthentication,))
+#@permission_classes((IsAuthenticated, ))
+#@authentication_classes((JWTAuthentication,))
 def changePassword(request):
     uname = request.POST['username']
     upass = request.POST['password']
