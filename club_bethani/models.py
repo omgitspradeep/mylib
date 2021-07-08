@@ -19,15 +19,15 @@ class Reader(models.Model):
     
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     GENDER = (
-        ('M', 'Male'),
-        ('F', 'Female'),
+        ('Male', 'Male'),
+        ('Female', 'Female'),
     )
     PROFESSION=(
-        ('A','Agriculture'),
-        ('T','Teacher'),
-        ('S','Student'),
-        ('B','Business'),
-        ('E','Employee'),
+        ('Agriculture','Agriculture'),
+        ('Teacher','Teacher'),
+        ('Student','Student'),
+        ('Business','Business'),
+        ('Employee','Employee'),
     )
 
     # we won't user firstname, lastname, email of "User" because it makes difficult for updating.
@@ -69,13 +69,13 @@ class Book(models.Model):
         ('U', 'Unavailable'),
     )
     LANGUAGE_CHOICES=(
-        ('N', 'Nepali'),
-        ('E', 'English'),
-        ('S', 'Sanskrit'),
-        ('T', 'Tharu'),
-        ('H', 'Hindi'),
-        ('Ne','Newari'),
-        ('O', 'Others')
+        ('Nepali', 'Nepali'),
+        ('English', 'English'),
+        ('Sanskrit', 'Sanskrit'),
+        ('Tharu', 'Tharu'),
+        ('Hindi', 'Hindi'),
+        ('Newarie','Newari'),
+        ('Others', 'Others')
     )
 
     reader = models.ForeignKey(Reader, on_delete=models.SET_NULL, related_name='Reader', null=True)
