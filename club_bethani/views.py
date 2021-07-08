@@ -58,7 +58,9 @@ class BookModelViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
+    
+    
+    
 @api_view(['POST'])
 @csrf_exempt
 def login(request):
@@ -106,10 +108,27 @@ def login(request):
             "refresh" : str(refresh),
             "token": str(refresh.access_token)
         }
+
+        #6. Get MyBooks 
+        try:
+            mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(person.id,)))
+            print(mybooks)
+            my_all_books="not_avl"
+            if mybooks.status_code == 200:
+                my_all_books = mybooks.json()
+        except:
+            return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
+
+        #7. Get MyEvents
+        events =getBorrows(person.id)
+
+
         return JsonResponse({
             "jwtToken":token_data,
             "profile":reader_seri.data,
-            "books":all_books
+            "books":all_books,
+            "mybooks":my_all_books,
+            "myevents":events
         }, status=HTTP_200_OK)
     else:
         return JsonResponse({"detail": "Account not activated.!"},status=HTTP_404_NOT_FOUND)
