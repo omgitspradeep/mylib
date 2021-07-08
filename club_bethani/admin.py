@@ -1,13 +1,9 @@
 from django.contrib import admin
 from club_bethani.models import Reader, Book, Borrow, BorrowHistory
 from django.contrib.auth.models import Group
+from django.contrib.admin import AdminSite
 
 # Register your models here.
-
-
-admin.site.header = "Bethani Book Club"
-admin.site.site_title = "BBC"
-admin.site.index_title ="INDEX TITLE"
 
 @admin.register(Reader)
 class ReaderAdmin(admin.ModelAdmin):

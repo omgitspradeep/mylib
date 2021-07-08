@@ -3,13 +3,15 @@ from django.db.models import fields
 from rest_framework import serializers
 from club_bethani.models import Reader, Book, Borrow, BorrowHistory
 from django.contrib.auth.models import User
+from drf_extra_fields.fields import Base64ImageField
 
 
 # Reader cannot activate his own account
 class ReaderSerializer(serializers.ModelSerializer):
     # read_only eans that the field will be included in the APIs output but won't be included during Create or Update operations on the endpoint
     # . To populate this field, we'll create a method to automatically fill the field with the request user.
-    
+    profile_pic = Base64ImageField(required=False)        
+   
     class Meta:
         model = Reader
         fields ="__all__"
@@ -18,6 +20,7 @@ class ReaderSerializer(serializers.ModelSerializer):
 
 # Owner of books should not be able to update borrow_count for his book.
 class BookSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=False)     
     class Meta:
         model = Book
         fields ='__all__'

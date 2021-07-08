@@ -5,6 +5,12 @@ from django.urls import base, path, include
 from club_bethani import views
 from rest_framework.routers import DefaultRouter
 
+from django.contrib import admin
+
+admin.site.site_header = "Bethani Book Society Administration"
+admin.site.site_title = "BBC"
+admin.site.index_title ="Welcome to Bethani Book Club"
+
 
 #creating router object
 router = DefaultRouter()
