@@ -70,7 +70,7 @@ def login(request):
     passwrd = request.POST['password']
     if uname is None or passwrd is None:
         return JsonResponse({'detail': 'Please enter Credentials!'},status=HTTP_400_BAD_REQUEST)
-    print(uname+" "+passwrd)
+    #print(uname+" "+passwrd)
     try:    
         if '@' in uname:
             kwargs = {'email': uname}
@@ -92,7 +92,7 @@ def login(request):
     #3. Check if Reader's account is activated 
     if person.account_activated: 
         reader_seri = ReaderSerializer(person)
-        print(reader_seri.data.items)
+        #print(reader_seri.data.items)
     
         # 4. Get allBooks (with pagination)
         try:
