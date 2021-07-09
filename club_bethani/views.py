@@ -110,7 +110,7 @@ def login(request):
         }
 
         #6. Get MyBooks 
-        
+        '''
         try:
             mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(person.id,)))
             my_all_books="not_avl"
@@ -119,7 +119,7 @@ def login(request):
 
         except:
             return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
-        
+        '''
         #7. Get MyEvents
         events =getBorrows(person.id)
 
@@ -128,7 +128,6 @@ def login(request):
             "jwtToken":token_data,
             "profile":reader_seri.data,
             "books":all_books,
-            "my_books":my_all_books,
             "myevents":events
         }, status=HTTP_200_OK)
 
