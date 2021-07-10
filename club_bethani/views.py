@@ -191,7 +191,32 @@ def readerApi(request,id=0):
     elif request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getReader/   Body: json data without image because image is sent as string for now
         readerId= request.data.get('id')
+        userId  = request.data.get('user')
+
         try:
+            # First Update user email if it is duplicate then it throws IntegrityError else User will be updated.
+            user = User.objects.get(id=userId)
+            user.email=request.data.get('email')
+
+            reader = Reader.objects.get(pk=readerId)
+            readers_serializer = ReaderSerializer(reader,data=request.data, partial=True)
+            if readers_serializer.is_valid():
+                user.save()
+                readers_serializer.save()
+                return JsonResponse({"detail" : "Reader updated Successfully."}, status=HTTP_200_OK)
+            else:
+                # This error mostly occurs when user mistakes in profession, address and gender
+                return JsonResponse({"detail" : "Failed to update a reader. Try again"}, status= HTTP_400_BAD_REQUEST)
+
+
+        except ObjectDoesNotExist as e:
+            return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+            return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
+               
+
+
+        """   try:
             reader = Reader.objects.get(pk=readerId)
             readers_serializer = ReaderSerializer(reader,data=request.data, partial=True)
             if readers_serializer.is_valid():
@@ -211,7 +236,8 @@ def readerApi(request,id=0):
         except IntegrityError as e:
             return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
             
-        
+         """
+
     elif request.method == 'DELETE':
         # API: http://127.0.0.1:8000/bbc/api/getReader/4
         
