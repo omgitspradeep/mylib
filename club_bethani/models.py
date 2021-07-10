@@ -25,9 +25,14 @@ class Reader(models.Model):
     PROFESSION=(
         ('Agriculture','Agriculture'),
         ('Teacher','Teacher'),
-        ('Student','Student'),
+        ('Medical','Medical'),
         ('Business','Business'),
-        ('Employee','Employee'),
+        ('Transportation','Transportation'),
+        ('Finance','Finance'),
+        ('Student','Student'),
+        ('Engineering','Engineering'),
+        ('Politics','Politics'),
+        ('Religion','Religion'),
     )
 
     # we won't user firstname, lastname, email of "User" because it makes difficult for updating.
