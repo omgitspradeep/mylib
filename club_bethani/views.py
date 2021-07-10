@@ -204,12 +204,12 @@ def readerApi(request,id=0):
                     usr.email=reader.email
                     usr.save()
 
-                return JsonResponse({"detail" : "Reader updated Successfully."}, safe=False)
-            return JsonResponse({"detail" : "Failed to update a reader. Try again"}, safe= False)
+                return JsonResponse({"detail" : "Reader updated Successfully."}, status=HTTP_200_OK)
+            return JsonResponse({"detail" : "Failed to update a reader. Try again"}, status= HTTP_400_BAD_REQUEST)
         except ObjectDoesNotExist as e:
             return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
         except IntegrityError as e:
-            return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
             
         
     elif request.method == 'DELETE':
