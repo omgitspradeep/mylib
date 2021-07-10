@@ -79,7 +79,7 @@ class Book(models.Model):
         ('Sanskrit', 'Sanskrit'),
         ('Tharu', 'Tharu'),
         ('Hindi', 'Hindi'),
-        ('Newarie','Newari'),
+        ('Newari','Newari'),
         ('Others', 'Others')
     )
 
