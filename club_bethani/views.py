@@ -56,8 +56,8 @@ class BookModelViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
     queryset = Book.objects.filter(reader__account_activated='True').order_by('-id')
     serializer_class = BookSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JWTAuthentication]
+    #permission_classes = [IsAuthenticated]
     
     
     
