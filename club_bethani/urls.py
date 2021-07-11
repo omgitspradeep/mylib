@@ -33,7 +33,7 @@ urlpatterns = [
         #Tested apis
         path('getReader/',views.readerApi),
         path('getReader/<int:id>',views.readerApi),
-        path('getBooks/<int:ownerId>',views.bookApi),  
+        path('getBooks/<int:bookID>',views.bookApi),  
         path('getMyBooks/<int:ownerId>',views.getMyBooks,name="mybooks"),
         path('changePassword/',views.changePassword),
 

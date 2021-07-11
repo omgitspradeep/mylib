@@ -260,57 +260,50 @@ def readerApi(request,id=0):
 @api_view(["PUT","DELETE"])
 #@permission_classes((IsAuthenticated, ))
 #@authentication_classes((JWTAuthentication,))
-def bookApi(request,ownerId=0):
-    try:
+def bookApi(request,bookID=0):
+    """ try:
         bookId = request.data.get('id')
     except:
-        Response({"detail" : "Provide bookId in Request"}, status=HTTP_400_BAD_REQUEST)
+        Response({"detail" : "Provide bookId in Request"}, status=HTTP_400_BAD_REQUEST) """
     
     if request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1,"desc":"ddfd" }
         if "borrow_count" not in request.data:
-            book = Book.objects.get(pk=bookId)
-            if ownerId == book.reader.id:
-                print("--------------OwnerID------------"+ str(book.reader.id))
+            book = Book.objects.get(pk=bookID)
 
-                book_serializer = BookSerializer(book,data=request.data, partial=True)
-                if book_serializer.is_valid():
-                    book_serializer.save()
-                    return Response(book_serializer.data, status=HTTP_200_OK)
-            else:
-                return Response({"detail" : "You can make changes on your books only."}, status=HTTP_400_BAD_REQUEST)
+            book_serializer = BookSerializer(book,data=request.data, partial=True)
+            if book_serializer.is_valid():
+                book_serializer.save()
+                return Response(book_serializer.data, status=HTTP_200_OK)
         else:
             return Response({"detail" : "Failed to create a Book. You cannot update borrow count of your own book."}, status=HTTP_400_BAD_REQUEST)            
         return Response({"detail" : "Failed to update a Book. Try again"}, status=HTTP_400_BAD_REQUEST)
    
     elif request.method == 'DELETE':
+        print("Inside DELETE")
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-        book = Book.objects.get(pk=bookId)
+        try:
+            read = Book.objects.get(pk=bookID)
+            ownerID= read.reader.id
+        except:
+            return JsonResponse({"detail": "Book does not exists!"},status=HTTP_404_NOT_FOUND)
 
-        if ownerId == book.reader.id:
-            read = Book.objects.get(pk=bookId)
-            read.delete() #http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-            try:
-                allbooks = requests.get("http://"+request.get_host()+reverse('allbookspag'))
-                mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(ownerId,)))
-
-                if allbooks.status_code == 200 and mybooks.status_code==200:                    
-                    return JsonResponse({
-                        "detail":"success",
-                        "books":allbooks.json(),
-                        "mybook":mybooks.json()
-                        }, status=HTTP_200_OK)
-                else:
-                    return JsonResponse({"detail": "Book successfully deleted. But data cannot be fetched."},status=HTTP_400_BAD_REQUEST)
-
-            except:
-                #Book already deleted
-                return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
-        
-        else:
-            #Book not deleted
-            return Response({"detail" : "You can delete your books only."},status=HTTP_400_BAD_REQUEST)
-
+        read.delete() #http://127.0.0.1:8000/bbc/api/getBooks/<int:bookID>
+        try:
+            allbooks = requests.get("http://"+request.get_host()+reverse('allbookspag'))
+            mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(ownerID,)))
+            if allbooks.status_code == 200 and mybooks.status_code==200:                    
+                return JsonResponse({
+                    "detail":"success",
+                    "books":allbooks.json(),
+                    "mybook":mybooks.json()
+                    }, status=HTTP_200_OK)
+            else:
+                return JsonResponse({"detail": "Book successfully deleted. But data cannot be fetched."},status=HTTP_400_BAD_REQUEST)
+        except:
+            #Book already deleted
+            return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
+ 
 
 @csrf_exempt
 @api_view(["GET",])
