@@ -283,10 +283,27 @@ def bookApi(request,ownerId=0):
         book = Book.objects.get(pk=bookId)
 
         if ownerId == book.reader.id:
-            reader = Book.objects.get(pk=bookId)
-            #reader.delete()http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
-            return Response({"detail" : "Book Deleted successfully."},status=HTTP_200_OK)
+            read = Book.objects.get(pk=bookId)
+            read.delete() #http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }
+            try:
+                allbooks = requests.get("http://"+request.get_host()+reverse('allbookspag'))
+                mybooks= requests.get("http://"+request.get_host()+reverse('mybooks',args=(ownerId,)))
+
+                if allbooks.status_code == 200 and mybooks.status_code==200:                    
+                    return JsonResponse({
+                        "detail":"success",
+                        "books":allbooks.json(),
+                        "mybook":mybooks.json()
+                        }, status=HTTP_200_OK)
+                else:
+                    return JsonResponse({"detail": "Book successfully deleted. But data cannot be fetched."},status=HTTP_400_BAD_REQUEST)
+
+            except:
+                #Book already deleted
+                return JsonResponse({"detail": "Something went wrong while fetching your books!"},status=HTTP_404_NOT_FOUND)
+        
         else:
+            #Book not deleted
             return Response({"detail" : "You can delete your books only."},status=HTTP_400_BAD_REQUEST)
 
 
