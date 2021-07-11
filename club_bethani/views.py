@@ -206,11 +206,11 @@ def readerApi(request,id=0):
                 return JsonResponse({"detail" : "Reader updated Successfully."}, status=HTTP_200_OK)
             else:
                 # This error mostly occurs when user mistakes in profession, address and gender
-                return JsonResponse({"detail" : "Failed to update a reader. Try again"}, status= HTTP_400_BAD_REQUEST)
+                return JsonResponse({"detail" : "Failed to update a reader. Try again"}, status= 600)
 
 
         except ObjectDoesNotExist as e:
-            return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=600)
         except IntegrityError as e:
             return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
                
