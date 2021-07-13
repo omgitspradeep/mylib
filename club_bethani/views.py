@@ -268,15 +268,12 @@ def bookApi(request,bookID=0):
     
     if request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1,"desc":"ddfd" }
-        if "borrow_count" not in request.data:
-            book = Book.objects.get(pk=bookID)
+        book = Book.objects.get(pk=bookID)
 
-            book_serializer = BookSerializer(book,data=request.data, partial=True)
-            if book_serializer.is_valid():
-                book_serializer.save()
-                return Response(book_serializer.data, status=HTTP_200_OK)
-        else:
-            return Response({"detail" : "Failed to create a Book. You cannot update borrow count of your own book."}, status=HTTP_400_BAD_REQUEST)            
+        book_serializer = BookSerializer(book,data=request.data, partial=True)
+        if book_serializer.is_valid():
+            book_serializer.save()
+            return Response(book_serializer.data, status=HTTP_200_OK)
         return Response({"detail" : "Failed to update a Book. Try again"}, status=HTTP_400_BAD_REQUEST)
    
     elif request.method == 'DELETE':
