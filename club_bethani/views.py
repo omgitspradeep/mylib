@@ -11,11 +11,8 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from datetime import datetime
-from requests import api
 
 from rest_framework import status
-from rest_framework import pagination
-from rest_framework.views import APIView
 
 from club_bethani.serializer import ReaderSerializer, BookSerializer, BorrowSerializer, BorrowHistorySerializer, UserSerializer
 from club_bethani.models import Reader, Book, Borrow, BorrowHistory
@@ -49,18 +46,6 @@ import requests
 # Create your views here.
 
 
-
-#This gives paginated output only when user provides token
-# Offers only GET and POST operations on Book (1. UPload new book 2. Get Paginated books)
-class BookModelViewSet(viewsets.ModelViewSet):
-    parser_classes = [MultiPartParser, FormParser]
-    queryset = Book.objects.filter(reader__account_activated='True').order_by('-id')
-    serializer_class = BookSerializer
-    #authentication_classes = [JWTAuthentication]
-    #permission_classes = [IsAuthenticated]
-    
-    
-    
 @api_view(['POST'])
 @csrf_exempt
 def login(request):
@@ -146,7 +131,9 @@ def login(request):
 class AllbooksPagination(ListAPIView):
     queryset = Book.objects.filter(reader__account_activated='True').order_by('-id')
     serializer_class = BookSerializer
-
+    #authentication_classes = [JWTAuthentication]
+    #permission_classes = [IsAuthenticated]
+    
 
 @api_view(['POST'])
 @csrf_exempt
@@ -219,30 +206,6 @@ def readerApi(request,id=0):
         except IntegrityError as e:
             return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
                
-
-
-        """   try:
-            reader = Reader.objects.get(pk=readerId)
-            readers_serializer = ReaderSerializer(reader,data=request.data, partial=True)
-            if readers_serializer.is_valid():
-                readers_serializer.save()
-
-                # If reader and user has different email addresses change user's email with reader's
-                usr = reader.user
-                reader = Reader.objects.get(user=usr)
-                if(usr.email != reader.email):
-                    usr.email=reader.email
-                    usr.save()
-
-                return JsonResponse({"detail" : "Reader updated Successfully."}, status=HTTP_200_OK)
-            return JsonResponse({"detail" : "Failed to update a reader. Try again"}, status= HTTP_400_BAD_REQUEST)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({"detail": "Requested User doesn't exists. Please try again"}, status=HTTP_400_BAD_REQUEST)
-        except IntegrityError as e:
-            return JsonResponse({"detail": "Provided Email already exists. Please try another"}, status=HTTP_404_NOT_FOUND)
-            
-         """
-
     elif request.method == 'DELETE':
         # API: http://127.0.0.1:8000/bbc/api/getReader/4
         
@@ -257,15 +220,10 @@ def readerApi(request,id=0):
 #This performs only BOOK UPDATE and BOOK DELETE
 # 
 @csrf_exempt
-@api_view(["PUT","DELETE"])
+@api_view(["POST","PUT","DELETE"])
 #@permission_classes((IsAuthenticated, ))
 #@authentication_classes((JWTAuthentication,))
 def bookApi(request,bookID=0):
-    """ try:
-        bookId = request.data.get('id')
-    except:
-        Response({"detail" : "Provide bookId in Request"}, status=HTTP_400_BAD_REQUEST) """
-    
     if request.method == 'PUT':
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1,"desc":"ddfd" }
         book = Book.objects.get(pk=bookID)
@@ -275,7 +233,33 @@ def bookApi(request,bookID=0):
             book_serializer.save()
             return Response(book_serializer.data, status=HTTP_200_OK)
         return Response({"detail" : "Failed to update a Book. Try again"}, status=HTTP_400_BAD_REQUEST)
-   
+    
+    elif request.method =="POST":
+        # Validate all fields before creating new user.
+        print("Inside post")
+        book = BookSerializer(data=request.data)
+        print("after serializer")
+        if book.is_valid():
+            book.save()
+            # Getting mybooks 
+            try:
+                paginator = PageNumberPagination()
+                paginator.page_size = 4
+                mybooks = Book.objects.filter(reader=request.data.get('reader')).order_by("-id")
+                result_page = paginator.paginate_queryset(mybooks, request)
+                mybooks_seri = BookSerializer(result_page, many= True)
+                return paginator.get_paginated_response(mybooks_seri.data)
+
+            except:
+                return JsonResponse({"detail":"Book upload successful. No data Returned."},status=HTTP_400_BAD_REQUEST)
+
+            #return JsonResponse({"detail":"Book is successfully added to club library. Thank you. "},status=HTTP_200_OK)
+        else:
+            return JsonResponse({"detail":"Book upload is unsuccessful. Try another"},status=HTTP_400_BAD_REQUEST)
+
+
+
+
     elif request.method == 'DELETE':
         print("Inside DELETE")
         # API: http://127.0.0.1:8000/bbc/api/getBooks/1   BODY: { "id": 1 }

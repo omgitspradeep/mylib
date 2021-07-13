@@ -70,8 +70,8 @@ class Reader(models.Model):
 class Book(models.Model):
 
     BOOK_STATUS = (
-        ('A', 'Available'),
-        ('U', 'Unavailable'),
+        ('Available', 'Available'),
+        ('Unavailable', 'Unavailable'),
     )
     LANGUAGE_CHOICES=(
         ('Nepali', 'Nepali'),
@@ -91,7 +91,7 @@ class Book(models.Model):
     available_status = models.BooleanField(default=True)  # Book could be unavailable beacause: 1) Borrowed 2) Reader doesn't want to share for now.
     borrow_count = models.PositiveIntegerField(default=0)  
     upload_date = models.DateTimeField(auto_now=False,auto_now_add=True)
-    language = models.CharField(max_length=10,choices=LANGUAGE_CHOICES,default='N')
+    language = models.CharField(max_length=10,choices=LANGUAGE_CHOICES,default='Nepali')
 
     def __str__(self):
         return self.name
