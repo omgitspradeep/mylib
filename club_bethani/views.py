@@ -334,10 +334,10 @@ def getBorrows(id):
 #@permission_classes((IsAuthenticated, ))
 #@authentication_classes((JWTAuthentication,))
 @csrf_exempt
-def borrowApi(request,id=0):
+def borrowApi(request,ownerID=0,borrowID=0):
     if request.method == 'GET':
         # Get all Borrow Events
-        data = getBorrows(id)
+        data = getBorrows(ownerID)
         return Response({"my_events":data}, status=HTTP_200_OK)
 
     elif request.method == 'POST':
@@ -372,6 +372,7 @@ def borrowApi(request,id=0):
                         borrow_serializer.save()
                         # Get all Borrow Events
                         data = getBorrows(borrowerId)
+                        
                         return Response({
                             "detail":"Book Request Successfull. Wait for confirmation....",
                             "my_events":data
@@ -472,28 +473,27 @@ def borrowApi(request,id=0):
     # Borrower can cancel his borrow request from here
     # or Owner of Book can cancel the borrow request from here
     elif request.method == 'DELETE':
-        borrow_data=JSONParser().parse(request)         
-        borrow_request = Borrow.objects.get(id=int(borrow_data['id']))
-        borrowerID = borrow_request.borrower.id
-        if borrow_request.borrow_accept and not borrow_request.book_received_by_borrower:
+        borrow_request_to_del = Borrow.objects.get(id=borrowID)
+        borrowerID = borrow_request_to_del.borrower.id
+        if borrow_request_to_del.borrow_accept and not borrow_request_to_del.book_received_by_borrower:
             # If borrow request is accepted by owner then "available_status" was set to FALSE
             # accepted: True , collected: False
-            book = borrow_request.book_borrowed
-            borrower = borrow_request.borrower
+            book = borrow_request_to_del.book_borrowed
+            borrower = borrow_request_to_del.borrower
             book.available_status=True
             book.save()
             borrower.books_borrowed -= 1
             borrower.save()
-            borrow_request.delete()
+            borrow_request_to_del.delete()
 
             data = getBorrows(borrowerID)
             return  Response({
                 "detail":"Borrow request cancelled Successfully. (accept: yes, collected: no)",
                 "my_events":data
                 }, status= HTTP_200_OK)
-        elif not borrow_request.borrow_accept:
+        elif not borrow_request_to_del.borrow_accept:
             # accepted: False , collected: False
-            borrow_request.delete()
+            borrow_request_to_del.delete()
             data = getBorrows(borrowerID)
             return  Response({
                 "detail":"Borrow request cancelled Successfully. (accept: no)",
