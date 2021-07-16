@@ -13,7 +13,8 @@ admin.site.index_title ="Welcome to Bethani Book Club"
 urlpatterns = [
 
         path('borrowBooks/',views.borrowApi),
-        path('borrowBooks/<int:id>',views.borrowApi), 
+        path('borrowBooks/<int:ownerID>',views.borrowApi), 
+        path('borrowBooks/<int:borrowID>/',views.borrowApi), 
         path('history/',views.borrowHistoryApi),
         path('signup/',views.signUpNewUser),
         path('allbooks/', views.AllbooksPagination.as_view(),name="allbookspag"),
