@@ -134,6 +134,10 @@ class Borrow(models.Model):
             return self.borrow_accept_date
         else:
             return "-"
+        
+    def book_owner(self):
+        return self.book_borrowed.reader
+
 
 
 # This helps owner of book to know whether the borrower is trustworthy before giving his book.
