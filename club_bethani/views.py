@@ -479,11 +479,14 @@ def borrowApi(request,ownerID=0,borrowID=0):
             # If borrow request is accepted by owner then "available_status" was set to FALSE
             # accepted: True , collected: False
             book = borrow_request_to_del.book_borrowed
-            borrower = borrow_request_to_del.borrower
             book.available_status=True
             book.save()
-            borrower.books_borrowed -= 1
-            borrower.save()
+            
+            if(borrow_request_to_del.borrow_accept): #Book borrowed is added only when book is accepted.
+                borrower = borrow_request_to_del.borrower
+                borrower.books_borrowed -= 1
+                borrower.save()
+            
             borrow_request_to_del.delete()
 
             data = getBorrows(borrowerID)
