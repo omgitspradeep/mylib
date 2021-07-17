@@ -22,7 +22,7 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(Borrow)
 class BorrowAdmin(admin.ModelAdmin):
-    list_display = ('id','borrower', 'book_borrowed', 'request_date','borrow_accept','accepted_time','book_received_by_borrower','note','remaining_days')
+    list_display = ('id','borrower', 'book_borrowed', 'book_owner','request_date','borrow_accept','accepted_time','book_received_by_borrower','note','remaining_days')
     list_filter=('request_date',)
 
 @admin.register(BorrowHistory)
